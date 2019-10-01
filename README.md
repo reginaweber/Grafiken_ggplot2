@@ -2,7 +2,7 @@
 
 Ein Kurs zu Verwendung von `ggplot2` verwendet im Rahmen eines Workshops im Doktorandenprogramm der Fakultät Gesellschaftswissenschaften der [Universität Duisburg-Essen](https://www.uni-due.de/gesellschaftswissenschaften/promotion_startseite.php). 
 
-Die Kursunterlagen basieren auf dem Kurs *A Gentle Guide to the Grammar of Graphics with `ggplot2`* von Garrick Aden-Buie. Der Originalkurs ist hier zu finden: <https://gadenbuie.github.io/gentle-ggplot2>
+Die Kursunterlagen basieren auf dem Kurs *A Gentle Guide to the Grammar of Graphics with `ggplot2`* von Garrick Aden-Buie. Der Originalkurs ist hier zu finden: <https://github.com/gadenbuie/gentle-ggplot2>
 
 ## Unterlagen
 
