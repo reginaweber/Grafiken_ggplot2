@@ -1,0 +1,3009 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Grafiken mit ggplot2  The Grammar of Graphics Plot</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Regina Weber   regina.weber@hochschule-rhein-waal.de" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="gentle-ggplot2.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Grafiken mit ggplot2 <br>The Grammar of Graphics Plot
+## UDE Workshop 02.10.2019
+### Regina Weber <br> <a href="mailto:regina.weber@hochschule-rhein-waal.de" class="email">regina.weber@hochschule-rhein-waal.de</a>
+### Based on: <strong><a href="https://github.com/gadenbuie/gentle-ggplot2" class="uri">https://github.com/gadenbuie/gentle-ggplot2</a></strong>
+
+---
+
+# Ablaufplan
+Vorgeschlagener Ablaufplan
+
+| Zeit | Thema |
+| --- | --- | --- | --- |
+| 9.30h-10.00h | Einführung, Tagesablauf &lt;br&gt; Vorstellung aller TN undErwartungen | 
+| 10.00-10.55h | Grundlagen der Grafikgestaltung &lt;br&gt;Einführung in ggplot2 – Logik und Grundlagen | 
+| 11.00-12.30h | Praktische Übungen: Grafiken in ggplot2 |
+| *12.30-13.30h* | *Mittagspause* |
+| 13.30-14.25h | Komplexe Grafiken in ggplot2 – Grundlagen und Beispiele | 
+| 14.30-16.00h | Praktische Übungen, komplexe Grundlagen |
+
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[Grundlagen der Grafikgestaltung
+]
+
+---
+layout: true
+# Grundlagen der Grafikgestaltung
+
+---
+
+## Warum nutzen wir Grafiken?
+
+.left-column[
+![](images/grafik.jpg)
+]
+
+.right-column[
+- Veranschaulichung/Darstellung eines Sachverhalts "auf einen Blick".
+- Hinweis/Betonung bestimmter Tendenzen (Regressionslinie)
+- Zusammenfassung komplexer Informationen
+]
+
+--
+
+.right-column[
+**Grafiken haben tendenziösen Charakter und sollten daher überlegt gewählt werden.**
+
+
+Link: [Ein kleines Beispiel zu den Mitgliederzahlen der Piratenpartei](https://flaschenpost.piratenpartei.de/2012/11/05/zahlen-lugen-nicht-diagramme-konnen-tauschen/).
+]
+
+---
+
+## Wie erstellen wir Grafiken? 
+
+.left-column[
+![](images/glz049.jpg)
+]
+
+.right-column[
+Vier Variablen müssen berücksichtigt werden:
+
+1. Absicht
+2. Zielgruppe
+3. Leseumstände (Paper? Buch? Präsentation?)
+4. Typografie (Schriftführung), Formen und Farbgestaltung
+
+.hl[Während 1-3 i.d.R. gut beantwortbar sind, gibt es zu 4. ein paar (Wissenschaftler*innen oft unbekannte) fachliche Grundlagen.]
+]
+
+---
+## Farben 
+
+.left-column[&lt;img src="images/goethe.jpg" style="height: 350px" /&gt;
+.footnote[Goethes Farbenkreis]
+]
+
+.right-column[Farben transportieren Emotionen und wecken Assoziationen. Wichtig für Grafiken sind aber besonders Farbkontraste und die Komplementärfarbe.
+
+- Gegenüberliegende Farben bilden starke Kontraste
+- Nebeneinanderliegende Farben eignen sich für Skalen
+]
+
+--
+.right-column[
+### Farben in R 
+- Webseite .hl[ColorBrewer]: http://colorbrewer2.org/
+- Package .hl[RColorBrewer]
+
+]
+
+
+---
+## Schrift 
+
+Drei unterschiedliche Schrifttypen:
+.font80[
+&lt;figure&gt;
+&lt;img src="images/Antiqua1.png" style="height: 110px"&gt;
+&lt;img src="images/Fraktur1.png" style="height: 110px"&gt;
+&lt;img src="images/Grotesk1.png" style="height: 110px"&gt;
+&lt;figcaption&gt;Antiqua (Serif), Fraktur und Groteskschrift (Sans-Serif).&lt;/figcaption&gt;
+&lt;/figure&gt;]
+
+--
+
+#### Positives Schriftbild
+
+- wenig Schriftarten (zwei, max. drei: Überschriften, Textteile, ggf. Beschriftungen), dies gilt auch für Grafikbeschriftungen!
+- Nutzung von *kursiv*, **fett**, und Schriftgröße um das Schriftbild zu strukturieren
+
+---
+## Literatur
+
+Gut zugängliche Literatur zum Thema
+
+&lt;div align="center"&gt;
+&lt;img src="images/Runk.png" style="height: 380px"&gt; 
+&lt;img src="images/Koschembar.png" style="height: 380px"&gt;
+&lt;/div&gt;
+
+---
+layout: true 
+
+
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[Warum *ggplot2*?]
+
+Adopted from [A Gentle Guide to the Grammar of Graphics with ggplot2](https://github.com/gadenbuie/gentle-ggplot2) by Garrick Aden-Buie  
+
+
+---
+
+
+layout: true
+# Warum *ggplot2*?
+
+---
+.left-column[
+![](images/Wickley.jpg)
+
+]
+
+.right-column[.font90[
+"...because there is a simple set of core principles and very few special cases, ggplot2 is also easy to learn (although it may take a little time to forget your preconceptions from other graphics tools)."]
+]
+.footnote[Wickham, S.1.]
+
+--
+.right-column[
+
+.hl[Idee]: Grafiken werden Stück für Stück zusammengesetzt  
+.hl[Ziel]: Maximale Flexibilität.
+
+Zentrale Prinzipien:
+1. Datenbasierte Herangehensweise (`tidy data` basiert)
+2. Daten werden visuellen Repräsentationen zugeordnet
+3. Manuelle Definition von Skalen, Farben, Formen und Gruppen.
+]
+
+---
+
+## Installation
+ 
+Installieren des [tidyverse](http://tidyverse.org)
+
+```r
+install.packages('tidyverse')
+```
+
+Tidyverse laden
+
+
+```r
+library(tidyverse)
+```
+
+```
+## -- Attaching packages ----------------------------------------------------------------------------- tidyverse 1.2.1 --
+```
+
+```
+## v ggplot2 3.2.1     v purrr   0.3.2
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   0.8.3     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0
+```
+
+```
+## -- Conflicts -------------------------------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+```
+
+---
+
+## Daten für den heutigen Tag
+
+[mpg](https://ggplot2.tidyverse.org/reference/mpg.html)-Datenset, Teil des R-Basissystems.
+
+[gapminder](http://www.gapminder.org/data/)-Datenset aus dem [`gapminder` package](https://github.com/jennybc/gapminder) von Jenny Bryan.
+
+
+```r
+## install.packages("gapminder")
+library(gapminder)
+```
+
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[gg heißt &lt;br&gt;Grammar of Graphics]
+
+
+
+
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+
+.left-code[
+### Welche Daten liegen hinter dem Plot?
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-2-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-3-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-1-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-4-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-5-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-6-1.png" width="100%" /&gt;
+]
+
+---
+layout:false
+
+.left-code[
+### Welche Daten liegen hinter dem Plot?
+**Spritverbrauch von Autos**
+
+- Manufacturer
+- Car Type (Class)
+- City MPG
+- Highway MPG
+]
+
+.right-plot[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; manufacturer &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; class &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; cty &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; hwy &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; model &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; audi &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; a4 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; audi &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; a4 quattro &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ford &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; expedition 2wd &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ford &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; explorer 4wd &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4runner 4wd &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; camry solara &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; corolla &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; land cruiser wagon 4wd &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+layout: false
+# Visuelle Elemente einer Grafik
+
+.font120[
+- **.hlb[Data]** -- Daten im tidy data-Format
+]
+
+--
+.font120[
+- **.hlb[Geom]etric objects**, die Daten repräsentieren
+]
+
+--
+.font120[
+- **.hlb[Aes]thetic mappings** von den Daten zu visuellen Elementen
+]
+
+--
+.font120[
+- **.hlb[Stat]istics** transformieren Daten vor der Visualisierung
+]
+
+--
+.font120[
+- **.hlb[Coord]inates** legen die Lokalisierung der Objekte fest
+]
+
+--
+.font120[
+- **.hlb[Scale]s** definieren das Verhältnis der Daten zueinander
+]
+
+--
+.font120[
+- **.hlb[Facet]s** gruppieren die Daten in Untergruppen
+]
+
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+
+```r
+ggplot(data)
+```
+]
+
+---
+
+.right-column[
+#### Tidy Data
+
+1. Jede Variable bildet eine .hl[Spalte]
+
+2. Jede Beobachtung bildet eine .hl[Zeile]
+
+3. Jede Beobachtungseinheit bildet eine .hl[Tabelle]
+]
+
+--
+
+.right-column[
+#### Vor jeder Grafikerstellung
+
+1. Welche Informationen möchte ich visualisieren?
+
+1. Sind diese Daten in .hl[einer Zeile/Spalte] für jeden Datenpunkt?
+]
+
+---
+.right-column[
+Messy data
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.30584 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.90227 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.39014 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.07500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.40000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.68310 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.91176 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.67553 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.13995 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+.right-column[
+Tidy data
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; pop &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.30584 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.07500 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.91176 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.90227 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.40000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.67553 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+
+```r
++ aes()
+```
+
+]
+
+---
+
+.right-column[
+Daten werden visuellen Elementen bzw. Parametern zugeordnet
+
+- year → **x**
+
+- pop → **y**
+
+- country → *shape*, *color*, etc.
+]
+
+--
+
+.right-column[
+
+```r
+aes(
+  x = year,
+  y = pop,
+  color = country
+)
+```
+]
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+
+---
+
+.right-column[
+Das geometrische Objekt wird festgelegt.
+
+&lt;img src="index_files/figure-html/geom_demo-1.png" width="650px" /&gt;
+]
+
+---
+
+.right-column[
+Einige der [wichtigsten bzw. meistgenutzten geometrischen Objekte](https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/)
+
+.font70.center[
+| Type | Function |
+|:----:|:--------:|
+| Point | `geom_point()` |
+| Line | `geom_line()` |
+| Bar | `geom_bar()`, `geom_col()` |
+| Histogram | `geom_histogram()` |
+| Regression | `geom_smooth()` |
+| Boxplot | `geom_boxplot()` |
+| Text | `geom_text()` |
+| Vert./Horiz. Line | `geom_{vh}line()` |
+| Count | `geom_count()` |
+| Density | `geom_density()` |
+
+&lt;https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/&gt;
+]
+]
+
+
+---
+
+.right-column[
+
+Es gibt aber noch mehr: &lt;http://ggplot2.tidyverse.org/reference/&gt;
+
+.font70[
+
+```
+##  [1] "geom_abline"     "geom_area"       "geom_bar"        "geom_bin2d"     
+##  [5] "geom_blank"      "geom_boxplot"    "geom_col"        "geom_contour"   
+##  [9] "geom_count"      "geom_crossbar"   "geom_curve"      "geom_density"   
+## [13] "geom_density_2d" "geom_density2d"  "geom_dotplot"    "geom_errorbar"  
+## [17] "geom_errorbarh"  "geom_freqpoly"   "geom_hex"        "geom_histogram" 
+## [21] "geom_hline"      "geom_jitter"     "geom_label"      "geom_line"      
+## [25] "geom_linerange"  "geom_map"        "geom_path"       "geom_point"     
+## [29] "geom_pointrange" "geom_polygon"    "geom_qq"         "geom_qq_line"   
+## [33] "geom_quantile"   "geom_raster"     "geom_rect"       "geom_ribbon"    
+## [37] "geom_rug"        "geom_segment"    "geom_sf"         "geom_sf_label"  
+## [41] "geom_sf_text"    "geom_smooth"     "geom_spoke"      "geom_step"      
+## [45] "geom_text"       "geom_tile"       "geom_violin"     "geom_vline"
+```
+]
+]
+--
+
+.right-column[
+&lt;img src="images/geom.gif" width="200px" style="float: right; margin-right: 100px; margin-top: -25px;"&gt;
+In RStudio `geom_` eintippen und:
+]
+
+
+---
+layout: true
+# Eine erste, einfache Grafik
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop)
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1a-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+* aes(x = year,
+*     y = pop)
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1b-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop) +
+* geom_point()
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1c-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+*     color = country) +
+  geom_point()
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+      color = country) +
+  geom_point() +
+* geom_line()
+```
+
+.font80[
+```r
+geom_path: 
+Es gibt nur eine 
+Beobachtung pro Gruppe (Land). 
+Daher ändern wir die 
+aesthetics für die Gruppe.
+```
+]
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot2-fake-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+      color = country) +
+  geom_point() +
+  geom_line(
+*   aes(group = country))
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot2-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+
+```r
+g &lt;- ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+      color = country) +
+  geom_point() +
+  geom_line(
+    aes(group = country))
+
+g
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot3-out-1.png" width="100%" /&gt;
+]
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+
+---
+
+.right-column[
+```r
+geom_*(mapping, data, stat, position)
+```
+
+- `data` *Geoms* können eigene Daten zugewiesen werden
+    - Muss zum globalen Koordinatorensystem passen
+- `map` *Geoms* können eigene *aesthetics* haben.
+    - Globale *aesthetics* werden sonst übernommen
+    - Spezifische *aesthetics* für einzelne *geoms*, z.B.
+        - `geom_point` benötigt `x` und `y`, optional `shape`, `color`, `size`, etc.
+        - `geom_ribbon`benötigt `x`, `ymin` und `ymax`, optional `fill`
+    - `?geom_ribbon`
+]
+
+---
+
+.right-column[
+```r
+geom_*(mapping, data, stat, position)
+```
+
+- `stat` Manche *geoms* transformieren die Daten
+    - Option: `stat = 'identity'`
+    - Ex: `geom_histogram` benötigt `stat_bin()` um Beobachtungen zu gruppieren
+    
+- `position` Manche ändern die Position im Koordinatensystem
+    - `'dodge'`, `'stack'`, `'jitter'`
+]
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+
+```r
++facet_wrap() 
+
++facet_grid()
+```
+]
+
+---
+
+
+
+.right-column[
+
+```r
+g + facet_wrap(~ country)
+```
+
+&lt;img src="index_files/figure-html/geom_facet-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + facet_grid(continent ~ country)
+```
+
+&lt;img src="index_files/figure-html/geom_grid-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+
+```r
++ labs()
+```
+]
+
+---
+
+.right-column[
+
+```r
+g + labs(x = "Year", y = "Population")
+```
+
+&lt;img src="index_files/figure-html/labs-ex-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+
+```r
++ coord_*()
+```
+]
+
+---
+
+.right-column[
+
+```r
+g + coord_flip()
+```
+
+&lt;img src="index_files/figure-html/coord-ex-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + coord_polar()
+```
+
+&lt;img src="index_files/figure-html/coord-ex2-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+### Scales
+
+```r
++ scale_*_*()
+```]
+
+---
+
+.right-column[ 
+`scale` + `_` + `&lt;aes&gt;` + `_` + `&lt;type&gt;` + `()`
+
+Welche Parameter sollen geändert werden? → `&lt;aes&gt;` &lt;br&gt;
+Wie soll der Parameter geändert werden? → `&lt;type&gt;`
+
+Beispiele
+- Die diskrete X-Achse soll verändert werden &lt;br&gt; `scale_x_discrete()`
+- Die Y-Achse soll logarithmiert werden &lt;br&gt;`scale_y_log10()`
+- Die Farbpalette soll geändert werden &lt;br&gt;`scale_fill_discrete()`&lt;br&gt;`scale_color_manual()`
+]
+
+---
+
+.right-column[
+
+```r
+g + scale_color_manual(values = c("peru", "pink", "plum"))
+```
+
+&lt;img src="index_files/figure-html/scale_ex1-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + scale_y_log10()
+```
+
+&lt;img src="index_files/figure-html/scale_ex2-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + scale_x_discrete(labels = c("MCMXCVII", "MMII", "MMVII"))
+```
+
+&lt;img src="index_files/figure-html/scale_ex4-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg heißt Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+### Scales
+### Theme
+
+```r
++ theme()
+```
+]
+
+---
+
+.right-column[
+Das Aussehen der Grafik ändern&lt;br&gt;&gt;
+d.h. Dinge, die keinen Daten zugeordnet sind.
+
+Einige *Themes* sind bereits enthalten
+
+- `g + theme_bw()`
+- `g + theme_dark()`
+- `g + theme_gray()`
+- `g + theme_light()`
+- `g + theme_minimal()`]
+
+---
+
+.right-column[
+Eine große Anzahl an Parametern kann individuell geändert werden:
+
+- Globale Parameter: `line`, `rect`, `text`, `title`
+- `axis`: x-, y-Achsentitel, -ticks, -linien
+- `legend`: Legenden
+- `panel`: Zeichenfläche
+- `plot`: Gesamte Grafik
+- `strip`: Facet labels]
+
+---
+
+.right-column[
+Die *Themes* haben sog. Hilfsfunktionen:
+
+- `element_blank()` löscht das jeweilige Element
+- `element_line()`
+- `element_rect()`
+- `element_text()`
+]
+
+---
+
+.right-column[
+
+```r
+g + theme_bw()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-1-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+.font80[
+
+```r
+g + theme_minimal() + theme(text = element_text(family = "Palatino"))
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
+]
+]
+
+---
+
+.right-column[
+Das *Theme* kann auch global definiert werden mit `theme_set()`
+
+
+```r
+my_theme &lt;- theme_bw() +
+  theme(
+    text = element_text(family = "Palatino", size = 12),
+    panel.border = element_rect(colour = 'grey80'), 
+    panel.grid.minor = element_blank()
+  )
+
+theme_set(my_theme)
+```
+
+Alle Grafiken im jeweiligen R-File werden mit diesem *Theme* erstellt!
+]
+
+---
+
+.right-column[
+
+```r
+g
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-3-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + theme(legend.position = 'bottom')
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+]
+
+---
+layout: false
+# Grafiken speichern
+
+Codebasierte Variante: `ggsave`
+
+
+```r
+ggsave(
+  filename = "my_plot.png",
+  plot = my_plot,
+  width = 10,
+  height = 8,
+  dpi = 100,
+  device = "png"
+)
+```
+
+Oder in RStudio manuell (nicht reproduzierbar!)
+---
+# Übung: Einfache Grafiken in R
+
+Datei: 
+
+`Companion-script_Uebungen.R`
+
+Übung 0: Reproduktion der ersten Grafik 
+
+Übung 1: Schritt für Schritt-Aufbau einer einfachen Grafik
+
+---
+
+class: inverse, center, middle
+
+# "Live" Coding: &lt;br&gt; Beispiele mit dem *gapminder*-Datensatz
+
+Adopted from [A Gentle Guide to the Grammar of Graphics with ggplot2](https://github.com/gadenbuie/gentle-ggplot2) by Garrick Aden-Buie  
+
+
+
+---
+layout: true
+# Einfache Grafiken mit *gapminder* Daten
+
+---
+
+```r
+library(gapminder)
+head(gapminder)
+```
+
+&lt;div class="kable-table"&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; continent &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lifeExp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; pop &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gdpPercap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Afghanistan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28.801 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8425333 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 779.4453 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Afghanistan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.332 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9240934 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 820.8530 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Afghanistan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10267083 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 853.1007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Afghanistan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 34.020 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11537966 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 836.1971 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Afghanistan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.088 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13079460 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 739.9811 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Afghanistan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Asia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 38.438 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14880372 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 786.1134 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;/div&gt;
+
+---
+
+```r
+glimpse(gapminder)
+```
+
+```
+Observations: 1,704
+Variables: 6
+$ country   &lt;fct&gt; Afghanistan, Afghanistan, Afghanistan, Afghanistan, Afghanistan, Af...
+$ continent &lt;fct&gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, A...
+$ year      &lt;int&gt; 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2...
+$ lifeExp   &lt;dbl&gt; 28.801, 30.332, 31.997, 34.020, 36.088, 38.438, 39.854, 40.822, 41....
+$ pop       &lt;int&gt; 8425333, 9240934, 10267083, 11537966, 13079460, 14880372, 12881816,...
+$ gdpPercap &lt;dbl&gt; 779.4453, 820.8530, 853.1007, 836.1971, 739.9811, 786.1134, 978.011...
+```
+
+--
+
+### Erste Grafik: `lifeExp` vs. `gdpPercap`
+
+---
+class: fullscreen
+layout: true
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-1-1.png)
+]
+
+--
+
+Zuerst: Datenpunkte
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp) +
+* geom_point()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-2-1.png)
+]
+
+--
+
+Next: Kontinente sichtbar machen.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp,
+*     color = continent) +
+  geom_point()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-3-1.png)
+]
+
+--
+
+Schlecht lesbar. Lösung:&lt;br&gt; Logarithmieren der X-Achse
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp,
+      color = continent) +
+  geom_point() +
+* scale_x_log10()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-4-1.png)
+]
+
+--
+
+Immer noch sehr unübersichtlich...
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp,
+      color = continent) +
+  geom_point() +
+  scale_x_log10() +
+* facet_wrap(~ continent) +
+* guides(color = FALSE)
+```
+
+Dank der Facets brauchen wir keine Farblegende mehr.
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-5-1.png)
+]
+
+--
+
+Overplotting ... 
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp,
+      color = continent) +
+* geom_point(size = 0.25) +
+  scale_x_log10() +
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-6-1.png)
+]
+
+--
+
+Gibt es einen Trend?
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp,
+      color = continent) +
+* geom_line() +
+  geom_point(size = 0.25) +
+  scale_x_log10() +
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-7-1.png)
+]
+
+--
+
+`geom_line` verbindet alle Punkte miteinander - nicht was wir wollten!
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap,
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+*   aes(group = country)
+  ) +
+  geom_point(size = 0.25) +
+  scale_x_log10() +
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-gdp-8-1.png)
+]
+
+--
+
+Für einen Trend brauchen wir einen Zeitverlauf. 
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+* aes(x = year,
+*     y = gdpPercap,
+      color = continent) +
+  geom_line(
+    aes(group = country)
+  ) +
+  geom_point(size = 0.25) +
+* scale_y_log10() +
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-gdp-year-1-1.png)
+]
+
+--
+
+X-Achsenbeschriftung nicht lesbar.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year,
+      y = gdpPercap,
+      color = continent) +
+  geom_line(
+    aes(group = country)
+  ) +
+  geom_point(size = 0.25) +
+  scale_y_log10() +
+* scale_x_continuous(breaks =
+*   seq(1950, 2000, 25)
+* ) +
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-gdp-year-2-1.png)
+]
+
+--
+
+Schauen wir uns die Lebenserwartung an.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+*     y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country)
+  ) +
+  geom_point(size = 0.25) +
+* #scale_y_log10() +
+  scale_x_continuous(breaks = 
+    seq(1950, 2000, 25)
+  ) +  
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-1-1.png)
+]
+
+--
+
+Die Trendlinie.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country)
+  ) +
+  geom_point(size = 0.25) +
+* geom_smooth() +
+  scale_x_continuous(breaks = 
+    seq(1950, 2000, 25)
+  ) +  
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-2-1.png)
+]
+
+--
+
+Die Trendlinie ist kaum sichtbar. 
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country),
+*   color = "grey75"
+  ) +
+  geom_point(size = 0.25) +
+  geom_smooth() + 
+  scale_x_continuous(breaks = 
+    seq(1950, 2000, 25)
+  ) +  
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-3-1.png)
+]
+
+--
+
+Die Punkte stören noch.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country),
+    color = "grey75"
+  ) +
+* #geom_point(size = 0.25) +
+  geom_smooth() + 
+  scale_x_continuous(breaks = 
+    seq(1950, 2000, 25)
+  ) +  
+  facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-4-1.png)
+]
+
+--
+
+Vergleich der Kontinente in einem Plot.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country),
+    color = "grey75"
+  ) +
+  geom_smooth() + 
+  # scale_x_continuous(
+  #   breaks = 
+  #     seq(1950, 2000, 25)
+  # ) +  
+* # facet_wrap(~ continent) +
+  guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-5-1.png)
+]
+
+--
+
+Jetzt brauchen wir wieder eine Legende.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country),
+    color = "grey75"
+  ) +
+  geom_smooth() + 
+* theme(
+* legend.position = "bottom"
+* )
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-6-1.png)
+]
+
+--
+
+Optische Korrekturen mit dem *minimal theme*.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country),
+    color = "grey75"
+  ) +
+  geom_smooth() + 
+* theme_minimal() +
+  theme(
+  legend.position = "bottom"
+  )
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-7-1.png)
+]
+
+--
+
+Schriftgröße ändern.
+
+---
+
+.left-code[
+
+```r
+ggplot(gapminder) +
+  aes(x = year, 
+      y = lifeExp,
+      color = continent) +
+  geom_line(
+    aes(group = country),
+    color = "grey75"
+  ) +
+  geom_smooth() + 
+  theme_minimal( 
+*   base_size = 8) +
+  theme(
+  legend.position = "bottom"
+  )
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-le-year-8-1.png)
+]
+
+---
+
+
+.left-code[
+
+### Ein Blick auf einzelne Länder 
+
+
+```r
+firstworld &lt;- 
+  gapminder %&gt;% 
+  filter(
+    country %in% c(
+      "United States",
+      "Canada",
+      "Germany",
+      "France"
+    )
+  )
+```
+
+]
+
+.right-plot[
+&lt;div class="kable-table"&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; continent &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lifeExp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; pop &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gdpPercap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.750 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14785584 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11367.161 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.960 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17010154 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12489.950 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.300 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18985849 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13462.486 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.130 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20819767 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16076.588 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.880 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22284500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18970.571 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.210 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23796400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22090.883 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.760 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25201900 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22898.792 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.860 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26549700 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26626.515 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.950 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28523502 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26342.884 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.610 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30305843 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28954.926 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.770 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31902268 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33328.965 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.653 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33390141 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36319.235 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.410 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42459667 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7029.809 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.930 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44310863 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8662.835 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.510 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 47124000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10560.486 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.550 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49569000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12999.918 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51732000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16107.192 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.830 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53165019 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18292.635 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.890 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 54433565 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20293.897 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.340 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 55630100 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22066.442 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.460 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 57374179 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24703.796 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.640 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58623428 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25889.785 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.590 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59925035 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28926.032 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; France &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.657 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 61083916 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30470.017 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69145952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7144.114 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.100 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71019069 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10187.827 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.300 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73739117 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12902.463 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76368453 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14745.626 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78717088 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18016.180 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78160773 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20512.921 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78335266 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22031.533 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.847 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77718298 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24639.186 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.070 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80597764 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26505.303 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.340 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82011073 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27788.884 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.670 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82350671 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30035.802 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Germany &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Europe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.406 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82400996 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32170.374 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.440 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 157553000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13990.482 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.490 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 171984000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14847.127 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.210 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186538000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16173.146 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.760 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 198712000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19530.366 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.340 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 209896000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21806.036 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 220239000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24072.632 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1982 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.650 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 232187835 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25009.559 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.020 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 242803533 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29884.350 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.090 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 256894189 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32003.932 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.810 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272911760 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35767.433 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.310 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287675526 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39097.100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.242 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301139947 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42951.653 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;/div&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = pop
+  ) +
+  geom_col()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-1-1.png)
+]
+
+--
+
+Wie teilt sich die Bevölkerung auf die Länder auf?
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = pop,
+*   fill = country
+  ) +
+  geom_col()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-2-1.png)
+]
+
+--
+
+Einfaches statt gestapeltes Balkendiagramm.
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = pop,
+    fill = country
+  ) +
+  geom_col(
+*   position = "dodge"
+  )
+```
+
+`position = "dodge"` platziert die Balken nebeneinander.
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-3-1.png)
+]
+
+--
+
+Zahlen auf der Y-Achse transformieren?
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+*   y = pop / 10^6,
+    fill = country
+  ) +
+  geom_col(
+    position = "dodge" 
+  )
+```
+
+*aesthetics* können rechnen!
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-4-1.png)
+]
+
+--
+
+Die Länder im Einzelnen.
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = pop / 10^6,
+    fill = country
+  ) +
+  geom_col(
+    position = "dodge" 
+  ) +
+* facet_wrap(~ country) +
+* guides(fill = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-5-1.png)
+]
+
+--
+
+Die Y-Achse kann individuell angepasst werden. (.hl[Achtung!])
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = pop / 10^6,
+    fill = country
+  ) +
+  geom_col(
+    position = "dodge" 
+  ) +
+  facet_wrap(~ country,
+*   scales = "free_y") +
+  guides(fill = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-6-1.png)
+]
+
+--
+
+Schauen wir uns die Lebenserwartung an.
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+*   y = lifeExp,
+    fill = country
+  ) +
+  geom_col(
+    position = "dodge" 
+  ) +
+  facet_wrap(~ country,
+    scales = "free_y") +
+  guides(fill = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-7-1.png)
+]
+
+--
+
+Hier wäre &amp;#x1F4C8; passender als &amp;#x1F4CA;.
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = lifeExp,
+    fill = country
+  ) +
+* geom_line() +
+  facet_wrap(~ country,
+    scales = "free_y") +
+  guides(fill = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-8-1.png)
+]
+
+--
+
+&amp;#x1F4CA; brauchen **fill**, &amp;#x1F4C8; brauchen **color**!
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = lifeExp,
+*   color = country
+  ) +
+  geom_line() +
+  facet_wrap(~ country,
+    scales = "free_y") +
+* guides(color = FALSE)
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-9-1.png)
+]
+
+--
+
+Dies ist in einer Grafik übersichtlicher!
+
+---
+
+.left-code[
+
+```r
+ggplot(firstworld) +
+  aes(
+    x = year,
+    y = lifeExp,
+    color = country
+  ) +
+  geom_line()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-1stworld-10-1.png)
+]
+
+---
+
+### Wie sieht es mit der Lebenserwartung aus?
+
+- auf einem Kontinent
+- global
+
+---
+
+.left-code[
+
+```r
+gapminder %&gt;% 
+  filter(
+    continent == "Americas"
+* ) %&gt;%
+* ggplot() +
+  aes(
+    x = year,
+    y = lifeExp
+  )
+```
+
+pipe funktioniert mit `ggplot()`!  
+.hl[Achtung]: `%&gt;%` vs. `+`
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-1-1.png)
+]
+
+--
+
+Boxplot mit dem Range der Lebenserwartung.
+
+---
+
+.left-code[
+
+```r
+gapminder %&gt;% 
+  filter(
+    continent == "Americas"
+  ) %&gt;%
+  ggplot() +
+  aes(
+    x = year,
+    y = lifeExp
+  ) +
+* geom_boxplot()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-2-1.png)
+]
+
+--
+
+Ein Boxplot pro Jahr.
+
+---
+
+.left-code[
+
+```r
+gapminder %&gt;% 
+  filter(
+    continent == "Americas"
+  ) %&gt;%
+* mutate(
+*   year = factor(year)
+* ) %&gt;%
+  ggplot() +
+  aes(
+    x = year,
+    y = lifeExp
+  ) +
+  geom_boxplot()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-3-1.png)
+]
+
+--
+
+Globale Lebenserwartung: Auskommentieren des Filters.
+
+---
+
+.left-code[
+
+```r
+gapminder %&gt;% 
+  # filter(
+  #   continent == "Americas"
+  # ) %&gt;%
+  mutate(
+    year = factor(year)
+  ) %&gt;% 
+  ggplot() +
+  aes(
+    x = year,
+    y = lifeExp
+  ) +
+  geom_boxplot()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-4-1.png)
+]
+
+--
+
+Einen Boxplot pro Kontinent?
+
+---
+
+.left-code[
+
+```r
+gapminder %&gt;% 
+  mutate(
+    year = factor(year)
+  ) %&gt;% 
+  ggplot() +
+  aes(
+    x = year,
+    y = lifeExp,
+*   fill = continent
+  ) +
+  geom_boxplot()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-5-1.png)
+]
+
+--
+
+Die Jahre sind kaum zu lesen, also: &amp;#x1F504;
+
+---
+
+.left-code[
+
+```r
+gapminder %&gt;% 
+  mutate(
+    year = factor(year)
+  ) %&gt;% 
+  ggplot() +
+  aes(
+    x = year,
+    y = lifeExp,
+    fill = continent
+  ) +
+  geom_boxplot() +
+* coord_flip()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-6-1.png)
+]
+
+--
+
+`dplyr` funktiniert auch im *ggplot2*-Code (Lebenserwartung pro Dekade)
+
+---
+
+.left-code[
+
+```r
+gapminder %&gt;% 
+  mutate(
+*   decade = floor(year / 10),
+*   decade = decade * 10,
+*   decade = factor(decade)
+  ) %&gt;% 
+  ggplot() +
+  aes(
+*   x = decade,
+    y = lifeExp,
+    fill = continent
+  ) +
+  geom_boxplot() +
+  coord_flip()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-7-1.png)
+]
+
+--
+
+Ohne Ozeanien: `filter`-Befehl.
+
+---
+
+.left-code[
+
+```r
+g &lt;- gapminder %&gt;% 
+* filter(
+*   continent != "Oceania"
+* ) %&gt;%
+  mutate(
+    decade = floor(year / 10) * 10, decade = factor(decade)      
+  ) %&gt;% 
+  ggplot() +
+  aes(
+    x = decade,
+    y = lifeExp,
+    fill = continent
+  ) +
+  geom_boxplot() +
+  coord_flip()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-8-1.png)
+]
+
+---
+
+.left-code[
+
+```r
+g +
+  theme_minimal(8) +
+  labs(
+    y = "Life Expectancy",
+    x = "Decade",
+    fill = NULL,
+    title = "Life Expectancy by Continent and Decade",
+    caption = "gapminder.org"
+  )
+```
+
+.hl[Achtung]: `x` und `y` bleiben auch bei `coord_flip()` erhalten.  
+
+`fill = NULL` entfernt den Titel der Label.
+]
+
+.right-plot[
+![](index_files/figure-html/gapminder-all-americas-9-1.png)
+]
+
+---
+layout: false
+class: inverse, center, middle
+
+# Komplexe Grafiken
+
+Adopted from [A Gentle Guide to the Grammar of Graphics with ggplot2](https://github.com/gadenbuie/gentle-ggplot2) by Garrick Aden-Buie
+
+who was inspired by the [TED-Talk "The Best Stats You've Ever Seen"](http://www.ted.com/talks/hans_rosling_shows_the_best_stats_you_ve_ever_seen) by Hans Rosling
+
+
+---
+# Grundlayout
+
+
+```r
+g_hr &lt;- 
+  ggplot(gapminder) +
+  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
+  geom_point() +
+  facet_wrap(~year)
+```
+
+.plot-callout[
+![](index_files/figure-html/hans-rosling-1-1.png)
+]
+
+---
+# Entfernen der Legende
+
+
+```r
+g_hr &lt;- 
+  ggplot(gapminder) +
+  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
+  geom_point() +
+  facet_wrap(~year) +
+  guides(color = FALSE, size = FALSE)
+```
+
+.plot-callout[
+![](index_files/figure-html/hans-rosling-1a-1.png)
+]
+
+---
+# X-Achse, Farbe und Größe der Punkte anpassen
+
+
+```r
+g_hr &lt;- 
+  g_hr +
+  scale_x_log10(breaks = c(10^3, 10^4, 10^5), labels = c("1k", "10k", "100k")) +
+  scale_color_manual(values = gapminder::country_colors) +
+  scale_size(range = c(0.5, 12))
+```
+
+.plot-callout[
+![](index_files/figure-html/hans-rosling-2-1.png)
+]
+
+---
+# Optimieren der Beschriftung
+
+&lt;br&gt;&lt;br&gt;
+
+
+```r
+g_hr &lt;- 
+  g_hr +
+  labs(
+    x = "GDP per capita",
+    y = "Life Expectancy"
+  ) +
+  theme_minimal(base_family = "Fira Sans") +
+  theme(
+    strip.text = element_text(size = 16, face = "bold"),
+    panel.border = element_rect(fill = NA, color = "grey40"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+.plot-callout.top-right[
+![](index_files/figure-html/hans-rosling-3-1.png)
+]
+
+---
+# Der gesamte Code und die Grafik
+
+.font70[
+
+```r
+ggplot(gapminder) +
+  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
+  geom_point() +
+  facet_wrap(~year) +
+  guides(color = FALSE, size = FALSE) +
+  scale_x_log10(
+    breaks = c(10^3, 10^4, 10^5), 
+    labels = c("1k", "10k", "100k")) +
+  scale_color_manual(values = gapminder::country_colors) +
+  scale_size(range = c(0.5, 12)) +
+  labs(
+    x = "GDP per capita",
+    y = "Life Expectancy") +
+  theme_minimal(14, base_family = "Fira Sans") +
+  theme(
+    strip.text = element_text(size = 16, face = "bold"),
+    panel.border = element_rect(fill = NA, color = "grey40"),
+    panel.grid.minor = element_blank())
+```
+]
+
+---
+class: fullscreen
+background-image: url(index_files/figure-html/hans-rosling-final-1.png)
+background-size: cover
+
+---
+# Bonus: Animierte Grafiken!
+
+.left-code[
+
+
+.font70[
+
+```r
+# library(devtools)
+# install_github("thomasp85/gganimate")
+library(gganimate)
+
+# Same plot without facet_wrap()
+g_hra + 
+  transition_states(year, 1, 0) + 
+  ggtitle("{closest_state}")
+```
+]
+]
+
+--
+
+.right-plot[
+![](images/hans-rosling-esque.gif)
+]
+
+---
+# Übung: Komplexe Grafiken in R
+
+Datei: `Companion-script_Uebungen.R`
+
+Übung 2: Grafiken mit gapminder Daten aufbauen 
+
+Übung 3: Americas Grafik mit Gapminder Daten
+
+Übung 4: Alle amerikanischen Länder
+
+Übung 5: Hans Rosling Grafik
+
+---
+layout: false
+class: inverse, middle, center
+
+# Zum Abschluss ... 
+
+---
+# Stack Exchange ist _die_ Adresse
+
+![](images/stack-exchange-search.png)
+
+---
+
+&lt;img src="images/stack-exchange-answer.png" style="max-height: 100%"&gt;
+
+---
+layout: false
+
+# ggplot2 Extensions: [ggplot2-exts.org](https://www.ggplot2-exts.org/gallery/)
+
+&lt;img src="images/ggplot2-exts-gallery.png" style="max-height: 100%"&gt;
+
+---
+# ggplot2-Tools
+
+### Nützliche Links
+
+- **ggplot2 Dokumentation:** &lt;http://ggplot2.tidyverse.org/&gt;
+
+- **R4DS - Datenvisualisierung (E-Book online):** &lt;http://r4ds.had.co.nz/data-visualisation.html&gt;
+
+- **Hadley Wickhams ggplot2 Buch:** &lt;https://www.springer.com/gp/book/9780387981413&gt;
+
+### Nützliche RStudio Add-Ins (nicht getestet)
+
+- [esquisse](https://github.com/dreamRs/esquisse): Interaktive ggplot2-Plots erstellen
+
+- [ggplotThemeAssist](https://github.com/calligross/ggthemeassist): ggplot-Themes interaktiv bearbeiten
+
+- [ggedit](https://github.com/metrumresearchgroup/ggedit): Layer, Achsen und Themes bearbeiten
+
+---
+# Übungen
+
+### #TidyTuesday
+
+- &lt;https://github.com/rfordatascience/tidytuesday&gt;
+
+### Datensets für Übungen
+
+- `fivethirtyeight`
+
+- `nycflights`
+
+- `ggplot2movies`
+
+---
+class: inverse, center, middle
+
+# Danke schön!
+
+.font150.text-white[
+Regina Weber &lt;br&gt;
+[www.reginaweber.de](https://www.reginaweber.de) &lt;br&gt;
+regina.weber@hochschule-rhein-waal.de
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "foundation",
+"highlightLines": true,
+"countIncrementalSlides": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
