@@ -6,7 +6,7 @@ Die Kursunterlagen basieren auf dem Kurs *A Gentle Guide to the Grammar of Graph
 
 ## Unterlagen
 
-Die Präsentation ist hier zu finden: <https://reginaweber.github.io/Grafiken_ggplot2/index.html>. Begleitend gibt es das Übungsskript [`Skript_Uebungen.R`](Skript_Uebungen.R) mit allen R-Codes aus der Präsentation und weiteren Übungen.
+Die Präsentation ist hier zu finden: <https://reginaweber.github.io/Grafiken_ggplot2>. Begleitend gibt es das Übungsskript [`Skript_Uebungen.R`](Skript_Uebungen.R) mit allen R-Codes aus der Präsentation und weiteren Übungen.
 
 ## Setup
 Es werden diese beiden Packages benötigt:
